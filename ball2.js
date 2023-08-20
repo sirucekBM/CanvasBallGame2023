@@ -13,6 +13,9 @@ export class Ball{
         this.previousY = y;
         this.vectorY = 0;
         this.vectorX = 0;
+        this.gravity = 0.05;
+        this.steper = 0;
+        this.maxSteper = 1000;
 
 
     }
@@ -28,13 +31,41 @@ export class Ball{
         ctx.fill();
         this.updateTempPosition();
 
-            // Detekce kolize s podlahou
-        if (this.y  + this.radius > this.canvas.height || this.y < this.radius) {
-            //this.y = this.canvas.height - this.radius;
+        if(this.dy === 0)return 
+
+        if(this.steper > this.maxSteper){
+            this.maxSteper = this.maxSteper * 0.8;
+            this.steper = 0;
+            this.dy = -this.dy;
+            return;
+        }
+
+
+
+        // Detekce kolize s podlahou
+        if (this.y  + this.radius > this.canvas.height) {
+            this.y = this.canvas.height - this.radius;
             //this.dy *= -0.8; // Odrážení od země
             //this.dx *= 0.5; // osa X
             this.dy = -this.dy;
+            //this.dy *= 0.8;
+            this.dx *= 0.8;
+            //this.speed = this.speed*0.5;
+            console.log("dy: " + this.dy + " y: " + this.y);
+
         }
+
+        // detekce ve smeru ze zdola na horu
+        if (this.y < this.radius) {
+            this.y = this.y + this.radius;
+            //this.dy *= -0.8; // Odrážení od země
+            //this.dx *= 0.5; // osa X
+            this.dy = -this.dy;
+            this.maxSteper = this.steper*0.8;
+            this.steper = 0;
+            console.log("max steper: " + this.maxSteper);
+        }
+
 
 
         if(this.x > this.canvas.width-this.radius || this.x < this.radius) {
@@ -46,9 +77,26 @@ export class Ball{
 
         }
 
-        
+
+
+
+
+        this.y += this.gravity;
         this.x += this.dx/10;
         this.y += this.dy/10;
+
+        if(this.dy<0){
+            console.log("dy < 0 maxSteper: " + this.maxSteper);
+            console.log("dy < 0 steper: " + this.steper);
+            this.steper +=1;
+            this.dy *= 0.99;
+            if(this.steper > this.maxSteper){
+                this.maxSteper = this.maxSteper * 0.8;
+                this.steper = 0;
+                this.dy = -this.dy;
+            }
+        }
+        
 
     }
 
@@ -66,69 +114,12 @@ export class Ball{
             {
                 if(this.x + this.radius >= rec.x && this.x - this.radius <= rec.x  + rec.w)
                 {
-                    
-                    this.energy *= 0.9; 
-
-                    if (this.energy < 0.6){
-                        this.dx = 0;
-                    }
-                    this.updateTempPosition();
-                    console.log("vektorX: " + this.vectorX + " vektorY: " + this.vectorY);
-                    if(this.vectorY == -1 && this.dx == 0){
-                        this.dy *= 1; 
-                    }
-
-                    this.dx *= this.energy;
-                    this.dy *= this.energy;
-                    console.log("energie: " + this.energy);
-                    if(this.dx == 0 && this.vectorY == 1 ){
-                        //this.dy = 0;
-                        console.log("pada dolu: " + this.vectorY);
-                        return; 
-                    }
 
                         let leftDistanc = Math.abs((this.x + this.radius + 1) - rec.x);
                         let rightDistanc = Math.abs((this.x - this.radius - 1) - (rec.x + rec.w));
                         let topDistanc = Math.abs((this.y + this.radius + 1) - rec.y);
                         let downDistanc = Math.abs((this.y - this.radius - 1)- (rec.y + rec.h));
                         let minValue = Math.min(leftDistanc, rightDistanc, topDistanc, downDistanc);
-                    
-                    if (minValue == topDistanc || minValue == downDistanc)
-                    {
-
-                        this.dy = -this.dy; 
-                        console.log("top or down");
-                        if(this.dx != 0){
-                            rec.x += moveRed;
-                            if (minValue == topDistanc){
-                                rec.y += movedObj;
-                            }else{
-                                rec.y -= movedObj;
-                            }
-                            return;
-                        }
-                    }
-
-                    if (minValue == leftDistanc || minValue == rightDistanc)
-                    {
-                        
-                        if(this.dx ==0){
-                            this.y += 10;
-                        }
-                        
-                        this.dx = -this.dx;; 
-                        console.log("lft or right");
-
-                        if(this.dx != 0){
-                            rec.x += moveRed;
-                            if (minValue == leftDistanc){
-                                rec.x += movedObj;
-                            }else{
-                                rec.x -= movedObj;
-                            }
-                            return;
-                        }
-                    }
                 }
 
             }

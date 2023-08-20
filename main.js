@@ -1,5 +1,5 @@
 
-import { Ball } from './ball.js';
+import { Ball } from './ball3.js';
 
 
 window.addEventListener('load',function(){
@@ -11,18 +11,17 @@ window.addEventListener('load',function(){
     canvas.addEventListener("mousemove", connectPath, false);
     canvas.addEventListener("click", onClick, false);
     var posXcircle = 10;
-    var posYcircle = canvas.height -20;
-    var mouseX = posXcircle;
-    var mouseY = posYcircle;
+    var posYcircle = canvas.height;
+
     var dX = 0;
     var dY = 0;
     var rxArr=[];
-    var maxSpeed = 20;
+    var maxSpeed = 150;
     var attraction = 0.5; 
     var mX = posXcircle;
     var mY  = posYcircle;
     var boolClick = false;
-    var ball = new Ball(canvas,20,50,10,"red",10,50);
+    var ball = new Ball(canvas,20,rect.height - 20,10,"red",50,1);
 
     function connectPath(e){
         mX = e.clientX - rect.left;
@@ -37,7 +36,7 @@ window.addEventListener('load',function(){
             ctx.strokeStyle ='rgb(140,85,31,' + opacityValue + ')';
             ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.moveTo(posXcircle, posYcircle);
+            ctx.moveTo(ball.x, ball.y);
             ctx.lineTo(mX, mY);
             ctx.stroke();
         }
@@ -46,25 +45,25 @@ window.addEventListener('load',function(){
 
 
     function onClick(e) {
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
+        let mouseX = e.clientX - rect.left;
+        let mouseY = e.clientY - rect.top;
         dX = (mouseX) - ball.x;
         dY = (mouseY) - ball.y;
         var distance = Math.sqrt(dX*dX + dY*dY);
         var speed = distance * attraction;
-        console.log("speed : " +speed);
-        if (speed > maxSpeed || speed < maxSpeed) speed = maxSpeed;
+        console.log("speed : " + speed);
+        if (speed > maxSpeed) speed = maxSpeed;
 
         console.log("speed2 : " +speed);
         console.log(dX + " : " +dY);
-
-        dX = (dX/distance) * speed;
-        dY = (dY/distance) * speed;
+        ball.speed = speed;
+        dX = (dX/distance);
+        dY = (dY/distance);
 
         console.log(dX + " : " +dY);
         console.log(distance);
         boolClick = true;
-        ball.update(dX,dY);
+        ball.initMoveBall(dX,dY);
 
     }
     
@@ -117,13 +116,13 @@ window.addEventListener('load',function(){
       const rxObject2 = new RectangleXY(602,150,10,80,colorX,"Rb")
       const rxObject3 = new RectangleXY(502,380,10,50,colorX,"Rc");
       rxArr.push(rx1);
-      rxArr.push(rx2);
-      rxArr.push(rx3);
-      rxArr.push(rx4);
-      rxArr.push(rx5);
-      rxArr.push(rxObject);
-      rxArr.push(rxObject2);
-      rxArr.push(rxObject3);
+      //rxArr.push(rx2);
+      //rxArr.push(rx3);
+      //rxArr.push(rx4);
+      //rxArr.push(rx5);
+      //rxArr.push(rxObject);
+      //rxArr.push(rxObject2);
+      //rxArr.push(rxObject3);
 
 
 
