@@ -13,13 +13,12 @@ export class Ball{
         this.previousY = y;
         this.vectorY = 0;
         this.vectorX = 0;
-        this.gravity = 0.5;
+        this.gravity = 0.3;
         this.steper = 0;
-        this.maxSteper = 1000;
         this.vx = 0.5;
         this.vy = 1;
         this.bounce = 0.7;
-        this.xFriction = 0.1;
+        this.xFriction = 0.3;
 
     }
     initMoveBall(dx,dy){
@@ -90,7 +89,9 @@ export class Ball{
         if (this.y < this.radius) {
             this.y = this.y + this.radius+3;
             this.dy = -this.dy;
-            //this.xF();
+            this.vy *= -1;
+            //alert(this.dy);
+            this.xF();
         }
 
 

@@ -21,7 +21,11 @@ window.addEventListener('load',function(){
     var mX = posXcircle;
     var mY  = posYcircle;
     var boolClick = false;
-    var ball = new Ball(canvas,20,rect.height - 20,10,"red",50,1);
+    var randX =  Math.floor(Math.random() * (rect.width - 10)) + 10;
+    var randY = Math.floor(Math.random() * (rect.height - 10)) + 10;
+
+
+    var ball = new Ball(canvas,randX,randY,10,"red",50,1);
 
     function connectPath(e){
         mX = e.clientX - rect.left;
@@ -100,7 +104,7 @@ window.addEventListener('load',function(){
         darawRandomRectangle();
 
         ball.draw(ctx);
-        ball.detectBallObj(rxArr);
+        //ball.detectBallObj(rxArr);
 
         requestAnimationFrame(animate);
       }
