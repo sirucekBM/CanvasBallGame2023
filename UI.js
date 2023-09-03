@@ -17,7 +17,7 @@ export class UI{
         context.fillStyle = this.fontColor;
 
         context.fillText('Vzdalenost: ' + this.ball.distance,20,50);
-        context.fillText('Vaha: ' + this.ball.gravity,20,90);
+        context.fillText('Gravitace: ' + this.ball.gravity,20,90);
         context.fillText('Energie: ' + this.ball.speed,20,130);
         context.restore();
     }

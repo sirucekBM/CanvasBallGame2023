@@ -7,7 +7,7 @@ export class Ball{
         this.speed = speed;
         this.energy = energy;
         this.canvas = canvas;
-        this.gravity = 0.3;
+        this.gravity = 0.4;
         this.vx = 0;
         this.vy = 0;
         this.bounce = 0.7;
