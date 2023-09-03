@@ -1,5 +1,6 @@
 
-import { Ball } from './ball3.js';
+import { Ball } from './ball.js';
+import { UI } from './UI.js';
 
 
 window.addEventListener('load',function(){
@@ -12,12 +13,9 @@ window.addEventListener('load',function(){
     canvas.addEventListener("click", onClick, false);
     var posXcircle = 10;
     var posYcircle = canvas.height;
-
-    var dX = 0;
-    var dY = 0;
     var rxArr=[];
-    var maxSpeed = 150;
-    var attraction = 0.5; 
+    var maxSpeed = 50;
+    var attraction = 0.1; 
     var mX = posXcircle;
     var mY  = posYcircle;
     var boolClick = false;
@@ -25,7 +23,8 @@ window.addEventListener('load',function(){
     var randY = Math.floor(Math.random() * (rect.height - 10)) + 10;
 
 
-    var ball = new Ball(canvas,randX,randY,10,"red",50,1);
+    let ball = new Ball(canvas,randX,randY,10,"red",50,1);
+    let ui  = new UI(ball);
 
     function connectPath(e){
         mX = e.clientX - rect.left;
@@ -43,31 +42,30 @@ window.addEventListener('load',function(){
             ctx.moveTo(ball.x, ball.y);
             ctx.lineTo(mX, mY);
             ctx.stroke();
+            calculateValueMoveBall(mX,mY);
         }
     }
 
+    function calculateValueMoveBall(mX,mY){
+        let dX = (mX) - ball.x;
+        let dY = (mY) - ball.y;
+        let distance = Math.sqrt(dX*dX + dY*dY).toFixed(3);
+        let speed = (distance * attraction).toFixed(3);
 
+        if (speed > maxSpeed) speed = maxSpeed;
+
+        ball.speed = speed;
+        ball.distance = distance;
+        ball.vx = (dX/distance);
+        ball.vy = (dY/distance);
+    }
 
     function onClick(e) {
         let mouseX = e.clientX - rect.left;
         let mouseY = e.clientY - rect.top;
-        dX = (mouseX) - ball.x;
-        dY = (mouseY) - ball.y;
-        var distance = Math.sqrt(dX*dX + dY*dY);
-        var speed = distance * attraction;
-        console.log("speed : " + speed);
-        if (speed > maxSpeed) speed = maxSpeed;
-
-        console.log("speed2 : " +speed);
-        console.log(dX + " : " +dY);
-        ball.speed = speed;
-        dX = (dX/distance);
-        dY = (dY/distance);
-
-        console.log(dX + " : " +dY);
-        console.log(distance);
+        calculateValueMoveBall(mouseX,mouseY);
         boolClick = true;
-        ball.initMoveBall(dX,dY);
+        ball.initMoveBall(boolClick);
 
     }
     
@@ -104,13 +102,14 @@ window.addEventListener('load',function(){
         darawRandomRectangle();
 
         ball.draw(ctx);
-        //ball.detectBallObj(rxArr);
+        ui.draw(ctx);
+        ball.detectBallObj(rxArr);
 
         requestAnimationFrame(animate);
       }
 
       let colorX = 'green';
-      const rx1 = new RectangleXY(102,120,150,90,colorX,"Ga");
+      const rx1 = new RectangleXY(102,220,250,190,colorX,"Ga");
       const rx2 = new RectangleXY(402,270,170,90,colorX,"Gb");
       const rx3 = new RectangleXY(202,250,10,110,colorX,"Gc");
       const rx4 = new RectangleXY(300,300,50,50,colorX,"Gd");

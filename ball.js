@@ -6,152 +6,107 @@ export class Ball{
         this.color = color;
         this.speed = speed;
         this.energy = energy;
-        this.dx = 0;
-        this.dy = 0;
         this.canvas = canvas;
-        this.previousX = x;
-        this.previousY = y;
-        this.vectorY = 0;
-        this.vectorX = 0;
-
-
+        this.gravity = 0.3;
+        this.vx = 0;
+        this.vy = 0;
+        this.bounce = 0.7;
+        this.xFriction = 0.8;
+        this.distance = 0;
+        this.move = false;
     }
-    initMoveBall(dx,dy){
-        this.dx = dx * this.speed;
-        this.dy = dy * this.speed;
+    initMoveBall(initMove){
+        this.vy = this.vy*this.speed;
+        this.vx = this.vx*this.speed;
+        this.move = initMove;
     }
     draw(ctx){
-
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius,0,Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
-        this.updateTempPosition();
-
-            // Detekce kolize s podlahou
-        if (this.y  + this.radius > this.canvas.height || this.y < this.radius) {
-            //this.y = this.canvas.height - this.radius;
-            //this.dy *= -0.8; // Odrážení od země
-            //this.dx *= 0.5; // osa X
-            this.dy = -this.dy;
+        if(this.move != false){
+            this.ballMovement();
         }
-
-
-        if(this.x > this.canvas.width-this.radius || this.x < this.radius) {
-            this.dx = -this.dx;
-            //projectile.velocityY *= -0.8; // Odrážení od země
-            //projectile.velocityX *= 0.5; // osa X
-            //this.dx = this.dx *0.5;
-            //this.dy *= -8;
-
-        }
-
-        
-        this.x += this.dx/10;
-        this.y += this.dy/10;
-
     }
-
+   ballMovement(){
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vy += this.gravity;
+        //detekce stran leva prava
+        if (this.x + this.radius > this.canvas.width || this.x - this.radius < 0){
+            this.vx *= -1;
+            this.xF();
+        }
+          // detekce spodni hrany
+        if (this.y + this.radius > this.canvas.height){// ||
+            this.y = this.canvas.height - this.radius;
+            this.floorDetection();
+        }
+        //detekce vrchni hrany
+        if (this.y < this.radius) {
+            this.y = this.y + this.radius+3;
+            this.vy *= -1;
+            this.xF();
+        }
+    }
+    floorDetection(){
+        // Re-positioning on the base
+        //bounce the ball
+        this.vy *= -this.bounce;
+        //do this otherwise, ball never stops bouncing
+        if(this.vy<0 && this.vy>-2.1)
+        this.vy=0;
+        //do this otherwise ball never stops on xaxis
+        if(Math.abs(this.vx)<1.1)
+        this.vx=0;
+        this.xF();
+    }
+    xF(){
+             if(this.vx>0)
+             this.vx = this.vx - this.xFriction;
+             if(this.vx<0)
+             this.vx = this.vx + this.xFriction;
+    }
     detectBallObj(rxArr){
         let moveRed = 0;
-        let movedObj = 10;
+        let movedObj = 0;
         rxArr.forEach(rec => {
-
-
             if(rec.color == "red"){
                 moveRed = 0;
             }
-
             if(this.y + this.radius >= rec.y && this.y - this.radius <= rec.y  + rec.h)
             {
                 if(this.x + this.radius >= rec.x && this.x - this.radius <= rec.x  + rec.w)
                 {
-                    
-                    this.energy *= 0.9; 
-
-                    if (this.energy < 0.6){
-                        this.dx = 0;
-                    }
-                    this.updateTempPosition();
-                    console.log("vektorX: " + this.vectorX + " vektorY: " + this.vectorY);
-                    if(this.vectorY == -1 && this.dx == 0){
-                        this.dy *= 1; 
-                    }
-
-                    this.dx *= this.energy;
-                    this.dy *= this.energy;
-                    console.log("energie: " + this.energy);
-                    if(this.dx == 0 && this.vectorY == 1 ){
-                        //this.dy = 0;
-                        console.log("pada dolu: " + this.vectorY);
-                        return; 
-                    }
-
                         let leftDistanc = Math.abs((this.x + this.radius + 1) - rec.x);
                         let rightDistanc = Math.abs((this.x - this.radius - 1) - (rec.x + rec.w));
                         let topDistanc = Math.abs((this.y + this.radius + 1) - rec.y);
                         let downDistanc = Math.abs((this.y - this.radius - 1)- (rec.y + rec.h));
                         let minValue = Math.min(leftDistanc, rightDistanc, topDistanc, downDistanc);
-                    
-                    if (minValue == topDistanc || minValue == downDistanc)
-                    {
-
-                        this.dy = -this.dy; 
-                        console.log("top or down");
-                        if(this.dx != 0){
-                            rec.x += moveRed;
-                            if (minValue == topDistanc){
-                                rec.y += movedObj;
-                            }else{
-                                rec.y -= movedObj;
-                            }
-                            return;
+                        if (minValue == topDistanc)
+                        {
+                            this.y = rec.y - this.radius;
+                            this.floorDetection();
                         }
-                    }
-
-                    if (minValue == leftDistanc || minValue == rightDistanc)
-                    {
-                        
-                        if(this.dx ==0){
-                            this.y += 10;
+                        if (minValue == downDistanc)
+                        {
+                            this.y = rec.y + rec.h + this.radius;
+                            this.floorDetection();
                         }
-                        
-                        this.dx = -this.dx;; 
-                        console.log("lft or right");
 
-                        if(this.dx != 0){
-                            rec.x += moveRed;
-                            if (minValue == leftDistanc){
-                                rec.x += movedObj;
-                            }else{
-                                rec.x -= movedObj;
-                            }
-                            return;
+                        if (minValue == leftDistanc)
+                        {
+                            this.x = rec.x - this.radius;
+                            this.vx *= -1;
                         }
-                    }
+
+                        if (minValue == rightDistanc)
+                        {
+                            this.x = rec.x +rec.w + this.radius;
+                            this.vx *= -1;
+                        }
                 }
-
             }
         })}
-
-        updateTempPosition() {
-            if(this.previousX < this.x){
-                this.vectorX = 1;
-            }else{
-                this.vectorX = -1;
-            }
-
-            if(this.previousY < this.y){
-                this.vectorY = 1;
-            }else{
-                this.vectorY = -1;
-            }
-
-            this.previousX = this.x;
-            this.previousY =this.y;
-
-        }
-
-
-
 }
